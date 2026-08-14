@@ -7,11 +7,12 @@ import { z } from "zod";
 import { salesApi } from "../api/sales-api";
 import { partnersApi } from "@/features/partners/api/partners-api";
 import { productsApi } from "@/features/products/api/products-api";
+import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { extractErrorMessage } from "@/lib/api-client";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatNumber } from "@/lib/format";
 
 const itemSchema = z.object({
   product_id: z.coerce.number().int().positive("Selecciona un producto"),
@@ -35,7 +36,10 @@ export function NewSalePage() {
   const { data: customers } = useQuery({
     queryKey: ["partners", "CLIENTE-or-AMBOS"],
     queryFn: async () => {
-      const [clientes, ambos] = await Promise.all([partnersApi.list("CLIENTE"), partnersApi.list("AMBOS")]);
+      const [clientes, ambos] = await Promise.all([
+        partnersApi.list("CLIENTE"),
+        partnersApi.list("AMBOS"),
+      ]);
       return [...clientes, ...ambos];
     },
   });
@@ -49,11 +53,31 @@ export function NewSalePage() {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { payment_method: "CONTADO", items: [{ product_id: 0, quantity: 1, unit_price: 0 }] },
+    defaultValues: {
+      payment_method: "CONTADO",
+      items: [{ product_id: 0, quantity: 1, unit_price: 0 }],
+    },
   });
   const { fields, append, remove } = useFieldArray({ control, name: "items" });
   const items = watch("items");
-  const total = items?.reduce((sum, item) => sum + (Number(item.quantity) || 0) * (Number(item.unit_price) || 0), 0) ?? 0;
+  const total =
+    items?.reduce(
+      (sum, item) => sum + (Number(item.quantity) || 0) * (Number(item.unit_price) || 0),
+      0,
+    ) ?? 0;
+
+  // Warn about insufficient stock while the user types, instead of waiting for
+  // the server to reject the sale on submit. The backend still validates it —
+  // this only surfaces the mistake earlier.
+  const stockWarnings = (items ?? []).map((item) => {
+    const product = products?.find((p) => p.id === Number(item.product_id));
+    if (!product) return null;
+    const requested = Number(item.quantity) || 0;
+    const available = Number(product.current_stock);
+    if (requested <= available) return null;
+    return { name: product.name, requested, available };
+  });
+  const hasStockProblem = stockWarnings.some((w) => w !== null);
 
   async function onSubmit(values: FormValues) {
     setError(null);
@@ -97,33 +121,50 @@ export function NewSalePage() {
             </Button>
           </div>
 
-          {fields.map((field, index) => (
-            <div key={field.id} className="grid grid-cols-[1fr_100px_120px_auto] items-end gap-2">
-              <Select {...register(`items.${index}.product_id`)}>
-                <option value="">Producto...</option>
-                {products?.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} ({p.current_stock})
-                  </option>
-                ))}
-              </Select>
-              <Input type="number" step="0.01" placeholder="Cant." {...register(`items.${index}.quantity`)} />
-              <Input
-                type="number"
-                step="0.01"
-                placeholder="Precio unit."
-                {...register(`items.${index}.unit_price`)}
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => fields.length > 1 && remove(index)}
-                disabled={fields.length === 1}
-              >
-                Quitar
-              </Button>
-            </div>
-          ))}
+          {fields.map((field, index) => {
+            const warning = stockWarnings[index];
+            return (
+              <div key={field.id} className="flex flex-col gap-1">
+                <div className="grid grid-cols-[1fr_100px_120px_auto] items-end gap-2">
+                  <Select {...register(`items.${index}.product_id`)}>
+                    <option value="">Producto...</option>
+                    {products?.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} — disponible: {formatNumber(p.current_stock)}
+                      </option>
+                    ))}
+                  </Select>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder="Cant."
+                    className={warning ? "border-red-400 bg-red-50" : undefined}
+                    {...register(`items.${index}.quantity`)}
+                  />
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder="Precio unit."
+                    {...register(`items.${index}.unit_price`)}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => fields.length > 1 && remove(index)}
+                    disabled={fields.length === 1}
+                  >
+                    Quitar
+                  </Button>
+                </div>
+                {warning && (
+                  <p className="text-xs font-medium text-red-600">
+                    No hay suficiente "{warning.name}": pides {formatNumber(warning.requested)} y
+                    solo hay {formatNumber(warning.available)}.
+                  </p>
+                )}
+              </div>
+            );
+          })}
           {errors.items?.message && <p className="text-sm text-red-600">{errors.items.message}</p>}
         </div>
 
@@ -132,13 +173,20 @@ export function NewSalePage() {
           <span className="text-lg font-semibold text-slate-800">{formatCurrency(total)}</span>
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {hasStockProblem && (
+          <Alert tone="warning" title="No se puede registrar la venta">
+            No tienes suficiente inventario para uno o mas productos. Ajusta las cantidades o
+            registra primero una compra.
+          </Alert>
+        )}
+
+        {error && <Alert title="No se pudo registrar la venta">{error}</Alert>}
 
         <div className="flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={() => navigate("/sales")}>
             Cancelar
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting || hasStockProblem}>
             Registrar venta
           </Button>
         </div>

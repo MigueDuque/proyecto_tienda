@@ -74,7 +74,7 @@ def test_register_sale_with_insufficient_stock_raises_and_persists_nothing():
     product = _make_product(uow, stock=Decimal("2"))
     use_case = RegisterSaleUseCase(uow)
 
-    with pytest.raises(InsufficientStockError):
+    with pytest.raises(InsufficientStockError) as exc_info:
         use_case.execute(
             RegisterSaleInput(
                 payment_method=PaymentMethod.CONTADO,
@@ -85,6 +85,13 @@ def test_register_sale_with_insufficient_stock_raises_and_persists_nothing():
                 ],
             )
         )
+
+    # The message must name the product and use clean quantities, since it is
+    # shown verbatim to the shop clerk in the UI.
+    message = str(exc_info.value)
+    assert "Producto de prueba" in message
+    assert "solicitaste 5" in message
+    assert "solo hay 2 disponibles" in message
 
     assert uow.products.get_by_id(product.id).current_stock == Decimal("2")
     assert uow.sales.list_all() == []

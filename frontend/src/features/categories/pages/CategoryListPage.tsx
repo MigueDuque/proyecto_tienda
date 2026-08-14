@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { categoriesApi } from "../api/categories-api";
 import type { Category } from "@/types/api";
+import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
@@ -121,7 +122,7 @@ export function CategoryListPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
             <Input label="Nombre" error={errors.name?.message} {...register("name")} />
             <Input label="Descripcion" {...register("description")} />
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <Alert>{error}</Alert>}
             <div className="mt-2 flex justify-end gap-2">
               <Button type="button" variant="secondary" onClick={() => setShowForm(false)}>
                 Cancelar

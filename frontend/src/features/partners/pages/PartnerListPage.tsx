@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { partnersApi } from "../api/partners-api";
 import type { Partner, PartnerType } from "@/types/api";
+import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -192,7 +193,7 @@ export function PartnerListPage() {
               <input type="checkbox" {...register("is_active")} />
               Activo
             </label>
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <Alert>{error}</Alert>}
             <div className="mt-2 flex justify-end gap-2">
               <Button type="button" variant="secondary" onClick={() => setShowForm(false)}>
                 Cancelar

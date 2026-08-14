@@ -1,3 +1,14 @@
+from decimal import Decimal
+
+
+def format_quantity(value: object) -> str:
+    """Renders a quantity for humans: 5.00 -> "5", 2.50 -> "2.5"."""
+    text = f"{Decimal(str(value)):f}"
+    if "." in text:
+        text = text.rstrip("0").rstrip(".")
+    return text or "0"
+
+
 class DomainError(Exception):
     """Base class for all domain-level errors."""
 
@@ -23,13 +34,14 @@ class InvalidCredentialsError(DomainError):
 
 
 class InsufficientStockError(DomainError):
-    def __init__(self, product_id: object, requested: object, available: object):
-        self.product_id = product_id
+    def __init__(self, product_name: str, requested: object, available: object):
+        self.product_name = product_name
         self.requested = requested
         self.available = available
         super().__init__(
-            f"Stock insuficiente para el producto {product_id}: "
-            f"solicitado={requested}, disponible={available}"
+            f'Stock insuficiente de "{product_name}": '
+            f"solicitaste {format_quantity(requested)} "
+            f"y solo hay {format_quantity(available)} disponibles."
         )
 
 

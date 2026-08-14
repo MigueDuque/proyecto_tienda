@@ -73,6 +73,20 @@ Correo:      admin@granero.com
 Contraseña:  admin123
 ```
 
+La sesión no expira: una vez que entras, la app no te vuelve a pedir la contraseña en ese navegador hasta que uses "Cerrar sesión". Si prefieres que caduque, cambia `JWT_EXPIRE_MINUTES` en `docker-compose.yml` a un número de minutos.
+
+## Dónde se guardan los datos
+
+Todo (productos, stock, ventas, compras y contabilidad) vive en PostgreSQL, que corre dentro de Docker — no hay que instalarlo ni registrarse en ningún lado. Los datos se guardan en un volumen de Docker llamado `pgdata`, **fuera** de los contenedores, así que **sobreviven** a:
+
+- apagar el computador,
+- `docker compose stop` / `docker compose down`,
+- reconstruir las imágenes con `docker compose up --build`.
+
+> ⚠️ El único comando que borra los datos es `docker compose down -v` (la `-v` elimina el volumen). Úsalo solo si quieres empezar de cero.
+
+Para ver la base de datos con clics, abre Adminer en http://localhost:8080 y conéctate con: motor `PostgreSQL`, servidor `postgres`, usuario `granero`, contraseña `granero`, base de datos `granero`.
+
 ## Desarrollo
 
 El código fuente está montado como volumen en ambos contenedores, así que los cambios en `backend/app` o `frontend/src` se recargan automáticamente (uvicorn `--reload` y Vite HMR).

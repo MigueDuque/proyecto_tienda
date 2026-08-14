@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/app/AuthContext";
+import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { extractErrorMessage } from "@/lib/api-client";
@@ -63,7 +64,7 @@ export function LoginPage() {
             error={errors.password?.message}
             {...register("password")}
           />
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <Alert>{error}</Alert>}
           <Button type="submit" disabled={isSubmitting} className="mt-2 w-full">
             {isSubmitting ? "Ingresando..." : "Ingresar"}
           </Button>

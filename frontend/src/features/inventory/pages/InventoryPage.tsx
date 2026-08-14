@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { inventoryApi } from "../api/inventory-api";
 import { productsApi } from "@/features/products/api/products-api";
+import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -152,7 +153,7 @@ export function InventoryPage() {
               {...register("quantity_delta")}
             />
             <Input label="Notas" {...register("notes")} />
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <Alert>{error}</Alert>}
             <div className="mt-2 flex justify-end gap-2">
               <Button type="button" variant="secondary" onClick={() => setShowForm(false)}>
                 Cancelar

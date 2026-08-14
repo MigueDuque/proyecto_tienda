@@ -45,7 +45,7 @@ class RegisterSaleUseCase:
                 if product is None:
                     raise NotFoundError("Producto", item.product_id)
                 if product.current_stock < item.quantity:
-                    raise InsufficientStockError(product.id, item.quantity, product.current_stock)
+                    raise InsufficientStockError(product.name, item.quantity, product.current_stock)
                 products_by_id[item.product_id] = product
                 item_subtotal = item.quantity * item.unit_price
                 subtotal += item_subtotal

@@ -7,6 +7,7 @@ import { z } from "zod";
 import { purchasesApi } from "../api/purchases-api";
 import { partnersApi } from "@/features/partners/api/partners-api";
 import { productsApi } from "@/features/products/api/products-api";
+import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -132,7 +133,7 @@ export function NewPurchasePage() {
           <span className="text-lg font-semibold text-slate-800">{formatCurrency(total)}</span>
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <Alert>{error}</Alert>}
 
         <div className="flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={() => navigate("/purchases")}>

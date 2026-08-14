@@ -30,7 +30,7 @@ class AdjustStockUseCase:
             new_stock = product.current_stock + data.quantity_delta
             if new_stock < 0:
                 raise InsufficientStockError(
-                    product.id, abs(data.quantity_delta), product.current_stock
+                    product.name, abs(data.quantity_delta), product.current_stock
                 )
 
             movement_type = (

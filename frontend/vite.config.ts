@@ -13,5 +13,11 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    watch: {
+      // Docker bind mounts on Windows/macOS do not emit filesystem events, so
+      // hot reload only works if Vite polls for changes.
+      usePolling: true,
+      interval: 300,
+    },
   },
 });

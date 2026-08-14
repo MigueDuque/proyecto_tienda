@@ -13,8 +13,11 @@ class JwtTokenService:
         self._expire_minutes = settings.jwt_expire_minutes
 
     def create_access_token(self, subject: str) -> str:
-        expire = datetime.now(UTC) + timedelta(minutes=self._expire_minutes)
-        payload = {"sub": subject, "exp": expire}
+        payload: dict[str, object] = {"sub": subject}
+        # jwt_expire_minutes <= 0 means "the session never expires": we omit the
+        # `exp` claim entirely, so the token stays valid until the user logs out.
+        if self._expire_minutes > 0:
+            payload["exp"] = datetime.now(UTC) + timedelta(minutes=self._expire_minutes)
         return jwt.encode(payload, self._secret, algorithm=self._algorithm)
 
     def decode_subject(self, token: str) -> str:
