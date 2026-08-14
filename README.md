@@ -45,7 +45,14 @@ El frontend sigue una estructura por *feature* (`frontend/src/features/<modulo>/
 
 ## Cómo correrlo
 
-Requiere [Docker](https://www.docker.com/) instalado.
+### Opción 1: instalador de un clic (recomendado si no tienes Docker/Node)
+
+- **Windows**: doble clic en `Instalar y Ejecutar.bat` (en la raíz del repo).
+- **macOS / Linux**: `./scripts/setup.sh`
+
+El script verifica si tienes Docker y Node.js instalados; si no, los instala automáticamente (usando `winget` en Windows o `Homebrew`/`get.docker.com` en macOS/Linux), levanta los contenedores y abre el navegador en `http://localhost:5173` cuando todo está listo. Si Docker Desktop necesita reiniciar Windows para habilitar WSL2, hazlo y vuelve a ejecutar el mismo archivo.
+
+### Opción 2: manual, si ya tienes Docker instalado
 
 ```bash
 git clone <url-del-repo>
@@ -53,7 +60,7 @@ cd 05_proyecto_eduardo
 docker compose up
 ```
 
-Eso es todo — al primer arranque, el backend aplica las migraciones de Alembic y siembra datos de demostración automáticamente (usuario admin, categorías, productos, terceros, plan de cuentas, y algunas compras/ventas de ejemplo para que el dashboard se vea poblado desde el primer momento).
+Con cualquiera de las dos opciones, al primer arranque el backend aplica las migraciones de Alembic y siembra datos de demostración automáticamente (usuario admin, categorías, productos, terceros, plan de cuentas, y algunas compras/ventas de ejemplo para que el dashboard se vea poblado desde el primer momento).
 
 - **Frontend**: http://localhost:5173
 - **API / Swagger**: http://localhost:8000/docs
