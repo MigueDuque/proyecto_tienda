@@ -37,6 +37,19 @@ services:
       - ./backend/scripts:/code/scripts
       - ./backend/tests:/code/tests
 
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:8000/api/v1
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/vite.config.ts:/app/vite.config.ts
+
   adminer:
     image: adminer
     depends_on:
