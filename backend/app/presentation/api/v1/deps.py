@@ -13,6 +13,11 @@ from app.application.use_cases.categories.category_use_cases import (
     ListCategoriesUseCase,
     UpdateCategoryUseCase,
 )
+from app.application.use_cases.inventory.inventory_use_cases import (
+    AdjustStockUseCase,
+    GetKardexUseCase,
+    ListInventoryMovementsUseCase,
+)
 from app.application.use_cases.partners.partner_use_cases import (
     CreatePartnerUseCase,
     DeletePartnerUseCase,
@@ -27,6 +32,16 @@ from app.application.use_cases.products.product_use_cases import (
     ListLowStockProductsUseCase,
     ListProductsUseCase,
     UpdateProductUseCase,
+)
+from app.application.use_cases.purchases.register_purchase import (
+    GetPurchaseUseCase,
+    ListPurchasesUseCase,
+    RegisterPurchaseUseCase,
+)
+from app.application.use_cases.sales.register_sale import (
+    GetSaleUseCase,
+    ListSalesUseCase,
+    RegisterSaleUseCase,
 )
 from app.domain.entities.user import User
 from app.domain.exceptions import InvalidCredentialsError
@@ -158,3 +173,46 @@ def get_get_partner_use_case(uow: AbstractUnitOfWork = Depends(get_uow)) -> GetP
 
 def get_list_partners_use_case(uow: AbstractUnitOfWork = Depends(get_uow)) -> ListPartnersUseCase:
     return ListPartnersUseCase(uow)
+
+
+# --- Purchases ---
+def get_register_purchase_use_case(
+    uow: AbstractUnitOfWork = Depends(get_uow),
+) -> RegisterPurchaseUseCase:
+    return RegisterPurchaseUseCase(uow)
+
+
+def get_list_purchases_use_case(uow: AbstractUnitOfWork = Depends(get_uow)) -> ListPurchasesUseCase:
+    return ListPurchasesUseCase(uow)
+
+
+def get_get_purchase_use_case(uow: AbstractUnitOfWork = Depends(get_uow)) -> GetPurchaseUseCase:
+    return GetPurchaseUseCase(uow)
+
+
+# --- Sales ---
+def get_register_sale_use_case(uow: AbstractUnitOfWork = Depends(get_uow)) -> RegisterSaleUseCase:
+    return RegisterSaleUseCase(uow)
+
+
+def get_list_sales_use_case(uow: AbstractUnitOfWork = Depends(get_uow)) -> ListSalesUseCase:
+    return ListSalesUseCase(uow)
+
+
+def get_get_sale_use_case(uow: AbstractUnitOfWork = Depends(get_uow)) -> GetSaleUseCase:
+    return GetSaleUseCase(uow)
+
+
+# --- Inventory ---
+def get_adjust_stock_use_case(uow: AbstractUnitOfWork = Depends(get_uow)) -> AdjustStockUseCase:
+    return AdjustStockUseCase(uow)
+
+
+def get_get_kardex_use_case(uow: AbstractUnitOfWork = Depends(get_uow)) -> GetKardexUseCase:
+    return GetKardexUseCase(uow)
+
+
+def get_list_inventory_movements_use_case(
+    uow: AbstractUnitOfWork = Depends(get_uow),
+) -> ListInventoryMovementsUseCase:
+    return ListInventoryMovementsUseCase(uow)

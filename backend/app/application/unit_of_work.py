@@ -2,8 +2,11 @@ from abc import ABC, abstractmethod
 from types import TracebackType
 
 from app.domain.repositories.category_repository import CategoryRepository
+from app.domain.repositories.inventory_repository import InventoryRepository
 from app.domain.repositories.partner_repository import PartnerRepository
 from app.domain.repositories.product_repository import ProductRepository
+from app.domain.repositories.purchase_repository import PurchaseRepository
+from app.domain.repositories.sale_repository import SaleRepository
 from app.domain.repositories.user_repository import UserRepository
 
 
@@ -18,6 +21,9 @@ class AbstractUnitOfWork(ABC):
     categories: CategoryRepository
     products: ProductRepository
     partners: PartnerRepository
+    inventory_movements: InventoryRepository
+    purchases: PurchaseRepository
+    sales: SaleRepository
 
     def __enter__(self) -> "AbstractUnitOfWork":
         return self

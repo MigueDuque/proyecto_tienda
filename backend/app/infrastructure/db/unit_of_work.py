@@ -5,12 +5,19 @@ from app.infrastructure.db.session import SessionLocal
 from app.infrastructure.repositories.sqlalchemy_category_repository import (
     SqlAlchemyCategoryRepository,
 )
+from app.infrastructure.repositories.sqlalchemy_inventory_repository import (
+    SqlAlchemyInventoryRepository,
+)
 from app.infrastructure.repositories.sqlalchemy_partner_repository import (
     SqlAlchemyPartnerRepository,
 )
 from app.infrastructure.repositories.sqlalchemy_product_repository import (
     SqlAlchemyProductRepository,
 )
+from app.infrastructure.repositories.sqlalchemy_purchase_repository import (
+    SqlAlchemyPurchaseRepository,
+)
+from app.infrastructure.repositories.sqlalchemy_sale_repository import SqlAlchemySaleRepository
 from app.infrastructure.repositories.sqlalchemy_user_repository import SqlAlchemyUserRepository
 
 
@@ -25,6 +32,9 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         self.categories = SqlAlchemyCategoryRepository(self._session)
         self.products = SqlAlchemyProductRepository(self._session)
         self.partners = SqlAlchemyPartnerRepository(self._session)
+        self.inventory_movements = SqlAlchemyInventoryRepository(self._session)
+        self.purchases = SqlAlchemyPurchaseRepository(self._session)
+        self.sales = SqlAlchemySaleRepository(self._session)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:

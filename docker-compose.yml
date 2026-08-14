@@ -35,6 +35,7 @@ services:
       - ./backend/app:/code/app
       - ./backend/alembic:/code/alembic
       - ./backend/scripts:/code/scripts
+      - ./backend/tests:/code/tests
 
   adminer:
     image: adminer

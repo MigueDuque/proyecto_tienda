@@ -5,7 +5,7 @@ from sqlalchemy import engine_from_config, pool
 
 from app.infrastructure.config import get_settings
 from app.infrastructure.db.base import Base
-from app.infrastructure.db.models import CategoryModel, PartnerModel, ProductModel, UserModel  # noqa: F401
+from app.infrastructure.db import models  # noqa: F401
 
 config = context.config
 

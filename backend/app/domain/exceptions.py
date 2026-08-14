@@ -33,6 +33,11 @@ class InsufficientStockError(DomainError):
         )
 
 
+class InvalidOperationError(DomainError):
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
 class UnbalancedEntryError(DomainError):
     def __init__(self, total_debit: object, total_credit: object):
         self.total_debit = total_debit
