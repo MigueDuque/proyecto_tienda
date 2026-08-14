@@ -22,7 +22,9 @@ from app.presentation.api.v1.schemas.accounting_schemas import (
     ManualEntryCreateRequest,
 )
 
-router = APIRouter(prefix="/accounting", tags=["accounting"], dependencies=[Depends(get_current_user)])
+router = APIRouter(
+    prefix="/accounting", tags=["accounting"], dependencies=[Depends(get_current_user)]
+)
 
 
 @router.get("/accounts", response_model=list[AccountResponse])
@@ -39,7 +41,9 @@ def get_account_balance(
 
 
 @router.get("/journal-entries", response_model=list[JournalEntryResponse])
-def list_journal_entries(use_case: ListJournalEntriesUseCase = Depends(get_list_journal_entries_use_case)):
+def list_journal_entries(
+    use_case: ListJournalEntriesUseCase = Depends(get_list_journal_entries_use_case),
+):
     return use_case.execute()
 
 

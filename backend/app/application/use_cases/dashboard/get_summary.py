@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 
 from app.application.unit_of_work import AbstractUnitOfWork
@@ -25,7 +25,7 @@ class GetDashboardSummaryUseCase:
 
     def execute(self) -> DashboardSummary:
         with self._uow as uow:
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
             month_start = today_start.replace(day=1)
 

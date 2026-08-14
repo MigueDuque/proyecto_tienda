@@ -17,7 +17,9 @@ from app.presentation.api.v1.schemas.inventory_schemas import (
     StockAdjustmentRequest,
 )
 
-router = APIRouter(prefix="/inventory", tags=["inventory"], dependencies=[Depends(get_current_user)])
+router = APIRouter(
+    prefix="/inventory", tags=["inventory"], dependencies=[Depends(get_current_user)]
+)
 
 
 @router.get("/movements", response_model=list[InventoryMovementResponse])

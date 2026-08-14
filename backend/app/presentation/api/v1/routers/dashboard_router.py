@@ -4,7 +4,9 @@ from app.application.use_cases.dashboard.get_summary import GetDashboardSummaryU
 from app.presentation.api.v1.deps import get_current_user, get_dashboard_summary_use_case
 from app.presentation.api.v1.schemas.dashboard_schemas import DashboardSummaryResponse
 
-router = APIRouter(prefix="/dashboard", tags=["dashboard"], dependencies=[Depends(get_current_user)])
+router = APIRouter(
+    prefix="/dashboard", tags=["dashboard"], dependencies=[Depends(get_current_user)]
+)
 
 
 @router.get("/summary", response_model=DashboardSummaryResponse)

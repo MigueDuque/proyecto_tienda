@@ -54,6 +54,8 @@ class SqlAlchemyInventoryRepository(InventoryRepository):
         stmt = select(InventoryMovementModel)
         if product_id is not None:
             stmt = stmt.where(InventoryMovementModel.product_id == product_id)
-        stmt = stmt.order_by(InventoryMovementModel.created_at.desc(), InventoryMovementModel.id.desc())
+        stmt = stmt.order_by(
+            InventoryMovementModel.created_at.desc(), InventoryMovementModel.id.desc()
+        )
         models = self._session.execute(stmt).scalars().all()
         return [_to_domain(m) for m in models]

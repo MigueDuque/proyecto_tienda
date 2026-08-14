@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import jwt
 
@@ -13,7 +13,7 @@ class JwtTokenService:
         self._expire_minutes = settings.jwt_expire_minutes
 
     def create_access_token(self, subject: str) -> str:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=self._expire_minutes)
+        expire = datetime.now(UTC) + timedelta(minutes=self._expire_minutes)
         payload = {"sub": subject, "exp": expire}
         return jwt.encode(payload, self._secret, algorithm=self._algorithm)
 

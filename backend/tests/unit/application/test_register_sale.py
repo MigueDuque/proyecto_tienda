@@ -13,7 +13,9 @@ from app.domain.exceptions import InsufficientStockError
 from tests.unit.application.fakes.in_memory_uow import InMemoryUnitOfWork, seed_chart_of_accounts
 
 
-def _make_product(uow: InMemoryUnitOfWork, stock: Decimal, cost: Decimal = Decimal("100")) -> Product:
+def _make_product(
+    uow: InMemoryUnitOfWork, stock: Decimal, cost: Decimal = Decimal("100")
+) -> Product:
     return uow.products.add(
         Product(
             id=None,
@@ -38,7 +40,11 @@ def test_register_sale_decrements_stock_and_creates_movement():
     result = use_case.execute(
         RegisterSaleInput(
             payment_method=PaymentMethod.CONTADO,
-            items=[SaleItemInput(product_id=product.id, quantity=Decimal("3"), unit_price=Decimal("150"))],
+            items=[
+                SaleItemInput(
+                    product_id=product.id, quantity=Decimal("3"), unit_price=Decimal("150")
+                )
+            ],
         )
     )
 
@@ -73,7 +79,9 @@ def test_register_sale_with_insufficient_stock_raises_and_persists_nothing():
             RegisterSaleInput(
                 payment_method=PaymentMethod.CONTADO,
                 items=[
-                    SaleItemInput(product_id=product.id, quantity=Decimal("5"), unit_price=Decimal("150"))
+                    SaleItemInput(
+                        product_id=product.id, quantity=Decimal("5"), unit_price=Decimal("150")
+                    )
                 ],
             )
         )

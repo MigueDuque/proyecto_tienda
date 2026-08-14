@@ -29,10 +29,14 @@ class AdjustStockUseCase:
 
             new_stock = product.current_stock + data.quantity_delta
             if new_stock < 0:
-                raise InsufficientStockError(product.id, abs(data.quantity_delta), product.current_stock)
+                raise InsufficientStockError(
+                    product.id, abs(data.quantity_delta), product.current_stock
+                )
 
             movement_type = (
-                MovementType.AJUSTE_ENTRADA if data.quantity_delta > 0 else MovementType.AJUSTE_SALIDA
+                MovementType.AJUSTE_ENTRADA
+                if data.quantity_delta > 0
+                else MovementType.AJUSTE_SALIDA
             )
             movement = uow.inventory_movements.add_movement(
                 InventoryMovement(

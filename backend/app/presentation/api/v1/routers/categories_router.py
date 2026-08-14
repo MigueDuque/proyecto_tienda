@@ -20,7 +20,9 @@ from app.presentation.api.v1.schemas.category_schemas import (
     CategoryResponse,
 )
 
-router = APIRouter(prefix="/categories", tags=["categories"], dependencies=[Depends(get_current_user)])
+router = APIRouter(
+    prefix="/categories", tags=["categories"], dependencies=[Depends(get_current_user)]
+)
 
 
 @router.get("", response_model=list[CategoryResponse])
@@ -37,7 +39,9 @@ def create_category(
 
 
 @router.get("/{category_id}", response_model=CategoryResponse)
-def get_category(category_id: int, use_case: GetCategoryUseCase = Depends(get_get_category_use_case)):
+def get_category(
+    category_id: int, use_case: GetCategoryUseCase = Depends(get_get_category_use_case)
+):
     return use_case.execute(category_id)
 
 

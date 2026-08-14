@@ -15,7 +15,9 @@ from app.presentation.api.v1.deps import (
 )
 from app.presentation.api.v1.schemas.purchase_schemas import PurchaseCreateRequest, PurchaseResponse
 
-router = APIRouter(prefix="/purchases", tags=["purchases"], dependencies=[Depends(get_current_user)])
+router = APIRouter(
+    prefix="/purchases", tags=["purchases"], dependencies=[Depends(get_current_user)]
+)
 
 
 @router.get("", response_model=list[PurchaseResponse])
@@ -42,5 +44,7 @@ def create_purchase(
 
 
 @router.get("/{purchase_id}", response_model=PurchaseResponse)
-def get_purchase(purchase_id: int, use_case: GetPurchaseUseCase = Depends(get_get_purchase_use_case)):
+def get_purchase(
+    purchase_id: int, use_case: GetPurchaseUseCase = Depends(get_get_purchase_use_case)
+):
     return use_case.execute(purchase_id)

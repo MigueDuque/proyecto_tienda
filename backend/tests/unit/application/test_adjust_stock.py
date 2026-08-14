@@ -33,7 +33,9 @@ def test_positive_adjustment_increments_stock():
     product = _make_product(uow, stock=Decimal("10"))
     use_case = AdjustStockUseCase(uow)
 
-    movement = use_case.execute(AdjustStockInput(product_id=product.id, quantity_delta=Decimal("4")))
+    movement = use_case.execute(
+        AdjustStockInput(product_id=product.id, quantity_delta=Decimal("4"))
+    )
 
     assert movement.movement_type == MovementType.AJUSTE_ENTRADA
     assert uow.products.get_by_id(product.id).current_stock == Decimal("14")

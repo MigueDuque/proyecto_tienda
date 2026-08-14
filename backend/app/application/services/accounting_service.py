@@ -51,10 +51,16 @@ class AccountingService:
             reference_id=sale.id,
             lines=[
                 JournalEntryLine(
-                    id=None, account_id=accounts[cash_or_receivable], debit=sale.total, credit=Decimal("0")
+                    id=None,
+                    account_id=accounts[cash_or_receivable],
+                    debit=sale.total,
+                    credit=Decimal("0"),
                 ),
                 JournalEntryLine(
-                    id=None, account_id=accounts[codes.VENTAS], debit=Decimal("0"), credit=sale.subtotal
+                    id=None,
+                    account_id=accounts[codes.VENTAS],
+                    debit=Decimal("0"),
+                    credit=sale.subtotal,
                 ),
                 JournalEntryLine(
                     id=None,
@@ -63,7 +69,10 @@ class AccountingService:
                     credit=Decimal("0"),
                 ),
                 JournalEntryLine(
-                    id=None, account_id=accounts[codes.INVENTARIO], debit=Decimal("0"), credit=total_cost
+                    id=None,
+                    account_id=accounts[codes.INVENTARIO],
+                    debit=Decimal("0"),
+                    credit=total_cost,
                 ),
             ],
         )
@@ -72,7 +81,9 @@ class AccountingService:
 
     def build_purchase_entry(self, accounts: dict[str, int], purchase: Purchase) -> JournalEntry:
         cash_or_payable = (
-            codes.CAJA if purchase.payment_method == PaymentMethod.CONTADO else codes.CUENTAS_POR_PAGAR
+            codes.CAJA
+            if purchase.payment_method == PaymentMethod.CONTADO
+            else codes.CUENTAS_POR_PAGAR
         )
 
         entry = JournalEntry(
@@ -82,7 +93,10 @@ class AccountingService:
             reference_id=purchase.id,
             lines=[
                 JournalEntryLine(
-                    id=None, account_id=accounts[codes.INVENTARIO], debit=purchase.total, credit=Decimal("0")
+                    id=None,
+                    account_id=accounts[codes.INVENTARIO],
+                    debit=purchase.total,
+                    credit=Decimal("0"),
                 ),
                 JournalEntryLine(
                     id=None,

@@ -46,7 +46,9 @@ def test_register_purchase_increments_stock_and_updates_cost():
             partner_id=supplier.id,
             payment_method=PaymentMethod.CREDITO,
             items=[
-                PurchaseItemInput(product_id=product.id, quantity=Decimal("5"), unit_cost=Decimal("120"))
+                PurchaseItemInput(
+                    product_id=product.id, quantity=Decimal("5"), unit_cost=Decimal("120")
+                )
             ],
         )
     )
@@ -101,7 +103,9 @@ def test_register_purchase_with_unknown_product_raises_not_found():
                 partner_id=supplier.id,
                 payment_method=PaymentMethod.CONTADO,
                 items=[
-                    PurchaseItemInput(product_id=999, quantity=Decimal("1"), unit_cost=Decimal("10"))
+                    PurchaseItemInput(
+                        product_id=999, quantity=Decimal("1"), unit_cost=Decimal("10")
+                    )
                 ],
             )
         )

@@ -91,7 +91,9 @@ class RegisterPurchaseUseCase:
                 uow.products.update(product)
 
             cash_or_payable = (
-                codes.CAJA if data.payment_method == PaymentMethod.CONTADO else codes.CUENTAS_POR_PAGAR
+                codes.CAJA
+                if data.payment_method == PaymentMethod.CONTADO
+                else codes.CUENTAS_POR_PAGAR
             )
             account_ids = resolve_account_ids(uow, [codes.INVENTARIO, cash_or_payable])
             entry = self._accounting.build_purchase_entry(account_ids, purchase)

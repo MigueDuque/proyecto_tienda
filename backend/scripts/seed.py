@@ -1,14 +1,27 @@
-"""Idempotent demo data seed: admin user, categories, products, partners."""
+"""Idempotent demo data seed: admin user, categories, products, partners,
+chart of accounts, and a handful of demo purchases/sales so the dashboard
+and accounting screens look populated right after `docker-compose up`.
+"""
 
 from decimal import Decimal
 
+from app.application.use_cases.purchases.register_purchase import (
+    PurchaseItemInput,
+    RegisterPurchaseInput,
+    RegisterPurchaseUseCase,
+)
+from app.application.use_cases.sales.register_sale import (
+    RegisterSaleInput,
+    RegisterSaleUseCase,
+    SaleItemInput,
+)
 from app.domain.accounting_codes import SEED_ACCOUNTS
 from app.domain.entities.account import Account
 from app.domain.entities.category import Category
 from app.domain.entities.partner import Partner
 from app.domain.entities.product import Product
 from app.domain.entities.user import User
-from app.domain.enums import AccountType, PartnerType
+from app.domain.enums import AccountType, PartnerType, PaymentMethod
 from app.infrastructure.config import get_settings
 from app.infrastructure.db.unit_of_work import SqlAlchemyUnitOfWork
 from app.infrastructure.security.password_hasher import BcryptPasswordHasher
@@ -94,7 +107,87 @@ def run() -> None:
 
         uow.commit()
 
+    seed_demo_transactions()
+
     print("Seed completado.")
+
+
+def seed_demo_transactions() -> None:
+    """Registers a few demo purchases/sales through the real use cases (so
+    inventory and accounting stay consistent), only on the very first run.
+    """
+    with SqlAlchemyUnitOfWork() as uow:
+        if uow.purchases.list_all():
+            return
+        products = {p.sku: p.id for p in uow.products.list()}
+        supplier = next(p for p in uow.partners.list() if p.name == "Distribuidora El Trigal")
+        supplier_customer = next(
+            p for p in uow.partners.list() if p.name == "Comercializadora La Cosecha"
+        )
+        frequent_customer = next(
+            p for p in uow.partners.list() if p.name == "Consumidor Final Frecuente"
+        )
+
+    RegisterPurchaseUseCase(SqlAlchemyUnitOfWork()).execute(
+        RegisterPurchaseInput(
+            partner_id=supplier.id,
+            payment_method=PaymentMethod.CREDITO,
+            items=[
+                PurchaseItemInput(products["GRA-001"], Decimal("30"), Decimal("1800")),
+                PurchaseItemInput(products["ABA-001"], Decimal("15"), Decimal("6500")),
+            ],
+        )
+    )
+    print("Compra demo registrada: Distribuidora El Trigal")
+
+    RegisterPurchaseUseCase(SqlAlchemyUnitOfWork()).execute(
+        RegisterPurchaseInput(
+            partner_id=supplier_customer.id,
+            payment_method=PaymentMethod.CONTADO,
+            items=[PurchaseItemInput(products["BEB-001"], Decimal("20"), Decimal("3200"))],
+        )
+    )
+    print("Compra demo registrada: Comercializadora La Cosecha")
+
+    RegisterSaleUseCase(SqlAlchemyUnitOfWork()).execute(
+        RegisterSaleInput(
+            partner_id=frequent_customer.id,
+            payment_method=PaymentMethod.CONTADO,
+            items=[
+                SaleItemInput(products["GRA-001"], Decimal("10"), Decimal("2500")),
+                SaleItemInput(products["ABA-003"], Decimal("5"), Decimal("1500")),
+            ],
+        )
+    )
+    print("Venta demo registrada: Consumidor Final Frecuente")
+
+    RegisterSaleUseCase(SqlAlchemyUnitOfWork()).execute(
+        RegisterSaleInput(
+            payment_method=PaymentMethod.CONTADO,
+            items=[SaleItemInput(products["GRA-002"], Decimal("8"), Decimal("3000"))],
+        )
+    )
+    print("Venta demo registrada: consumidor final")
+
+    RegisterSaleUseCase(SqlAlchemyUnitOfWork()).execute(
+        RegisterSaleInput(
+            partner_id=supplier_customer.id,
+            payment_method=PaymentMethod.CREDITO,
+            items=[
+                SaleItemInput(products["ASE-001"], Decimal("6"), Decimal("7500")),
+                SaleItemInput(products["GRA-004"], Decimal("10"), Decimal("2200")),
+            ],
+        )
+    )
+    print("Venta demo registrada: Comercializadora La Cosecha")
+
+    RegisterSaleUseCase(SqlAlchemyUnitOfWork()).execute(
+        RegisterSaleInput(
+            payment_method=PaymentMethod.CONTADO,
+            items=[SaleItemInput(products["BEB-001"], Decimal("12"), Decimal("4500"))],
+        )
+    )
+    print("Venta demo registrada: consumidor final")
 
 
 if __name__ == "__main__":

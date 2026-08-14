@@ -45,9 +45,7 @@ class RegisterSaleUseCase:
                 if product is None:
                     raise NotFoundError("Producto", item.product_id)
                 if product.current_stock < item.quantity:
-                    raise InsufficientStockError(
-                        product.id, item.quantity, product.current_stock
-                    )
+                    raise InsufficientStockError(product.id, item.quantity, product.current_stock)
                 products_by_id[item.product_id] = product
                 item_subtotal = item.quantity * item.unit_price
                 subtotal += item_subtotal
@@ -93,9 +91,16 @@ class RegisterSaleUseCase:
 
             total_cost = sum((item.quantity * item.unit_cost for item in sale.items), Decimal("0"))
             cash_or_receivable = (
-                codes.CAJA if data.payment_method == PaymentMethod.CONTADO else codes.CUENTAS_POR_COBRAR
+                codes.CAJA
+                if data.payment_method == PaymentMethod.CONTADO
+                else codes.CUENTAS_POR_COBRAR
             )
-            needed_codes = [cash_or_receivable, codes.VENTAS, codes.COSTO_DE_VENTAS, codes.INVENTARIO]
+            needed_codes = [
+                cash_or_receivable,
+                codes.VENTAS,
+                codes.COSTO_DE_VENTAS,
+                codes.INVENTARIO,
+            ]
             account_ids = resolve_account_ids(uow, needed_codes)
             entry = self._accounting.build_sale_entry(account_ids, sale, total_cost)
             uow.journal_entries.add(entry)
