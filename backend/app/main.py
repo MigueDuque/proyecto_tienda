@@ -9,8 +9,10 @@ from app.domain.exceptions import (
     NotFoundError,
 )
 from app.infrastructure.config import get_settings
+from app.presentation.api.v1.routers.accounting_router import router as accounting_router
 from app.presentation.api.v1.routers.auth_router import router as auth_router
 from app.presentation.api.v1.routers.categories_router import router as categories_router
+from app.presentation.api.v1.routers.dashboard_router import router as dashboard_router
 from app.presentation.api.v1.routers.inventory_router import router as inventory_router
 from app.presentation.api.v1.routers.partners_router import router as partners_router
 from app.presentation.api.v1.routers.products_router import router as products_router
@@ -57,3 +59,5 @@ app.include_router(partners_router, prefix="/api/v1")
 app.include_router(purchases_router, prefix="/api/v1")
 app.include_router(sales_router, prefix="/api/v1")
 app.include_router(inventory_router, prefix="/api/v1")
+app.include_router(accounting_router, prefix="/api/v1")
+app.include_router(dashboard_router, prefix="/api/v1")

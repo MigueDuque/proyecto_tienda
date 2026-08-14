@@ -10,7 +10,7 @@ from app.application.use_cases.sales.register_sale import (
 from app.domain.entities.product import Product
 from app.domain.enums import MovementType, PaymentMethod
 from app.domain.exceptions import InsufficientStockError
-from tests.unit.application.fakes.in_memory_uow import InMemoryUnitOfWork
+from tests.unit.application.fakes.in_memory_uow import InMemoryUnitOfWork, seed_chart_of_accounts
 
 
 def _make_product(uow: InMemoryUnitOfWork, stock: Decimal, cost: Decimal = Decimal("100")) -> Product:
@@ -31,6 +31,7 @@ def _make_product(uow: InMemoryUnitOfWork, stock: Decimal, cost: Decimal = Decim
 
 def test_register_sale_decrements_stock_and_creates_movement():
     uow = InMemoryUnitOfWork()
+    seed_chart_of_accounts(uow)
     product = _make_product(uow, stock=Decimal("10"), cost=Decimal("100"))
     use_case = RegisterSaleUseCase(uow)
 
@@ -55,6 +56,12 @@ def test_register_sale_decrements_stock_and_creates_movement():
     assert movements[0].balance_after == Decimal("7")
     assert uow.committed is True
 
+    entries = uow.journal_entries.list_all()
+    assert len(entries) == 1
+    entry = entries[0]
+    # subtotal (450) + COGS (3 * cost 100 = 300) on both sides
+    assert entry.total_debit() == entry.total_credit() == Decimal("750")
+
 
 def test_register_sale_with_insufficient_stock_raises_and_persists_nothing():
     uow = InMemoryUnitOfWork()
@@ -74,4 +81,5 @@ def test_register_sale_with_insufficient_stock_raises_and_persists_nothing():
     assert uow.products.get_by_id(product.id).current_stock == Decimal("2")
     assert uow.sales.list_all() == []
     assert uow.inventory_movements.list_all() == []
+    assert uow.journal_entries.list_all() == []
     assert uow.committed is False

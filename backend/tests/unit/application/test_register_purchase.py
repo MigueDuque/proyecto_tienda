@@ -11,7 +11,7 @@ from app.domain.entities.partner import Partner
 from app.domain.entities.product import Product
 from app.domain.enums import MovementType, PartnerType, PaymentMethod
 from app.domain.exceptions import InvalidOperationError, NotFoundError
-from tests.unit.application.fakes.in_memory_uow import InMemoryUnitOfWork
+from tests.unit.application.fakes.in_memory_uow import InMemoryUnitOfWork, seed_chart_of_accounts
 
 
 def _make_product(uow: InMemoryUnitOfWork, stock: Decimal = Decimal("10")) -> Product:
@@ -36,6 +36,7 @@ def _make_supplier(uow: InMemoryUnitOfWork, type: PartnerType = PartnerType.PROV
 
 def test_register_purchase_increments_stock_and_updates_cost():
     uow = InMemoryUnitOfWork()
+    seed_chart_of_accounts(uow)
     product = _make_product(uow, stock=Decimal("10"))
     supplier = _make_supplier(uow)
     use_case = RegisterPurchaseUseCase(uow)
@@ -61,6 +62,11 @@ def test_register_purchase_increments_stock_and_updates_cost():
     assert movements[0].movement_type == MovementType.ENTRADA_COMPRA
     assert movements[0].balance_after == Decimal("15")
     assert uow.committed is True
+
+    entries = uow.journal_entries.list_all()
+    assert len(entries) == 1
+    entry = entries[0]
+    assert entry.total_debit() == entry.total_credit() == Decimal("600")
 
 
 def test_register_purchase_rejects_non_supplier_partner():

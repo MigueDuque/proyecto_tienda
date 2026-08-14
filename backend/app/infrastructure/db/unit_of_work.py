@@ -2,6 +2,10 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.application.unit_of_work import AbstractUnitOfWork
 from app.infrastructure.db.session import SessionLocal
+from app.infrastructure.repositories.sqlalchemy_accounting_repository import (
+    SqlAlchemyAccountRepository,
+    SqlAlchemyJournalEntryRepository,
+)
 from app.infrastructure.repositories.sqlalchemy_category_repository import (
     SqlAlchemyCategoryRepository,
 )
@@ -35,6 +39,8 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         self.inventory_movements = SqlAlchemyInventoryRepository(self._session)
         self.purchases = SqlAlchemyPurchaseRepository(self._session)
         self.sales = SqlAlchemySaleRepository(self._session)
+        self.accounts = SqlAlchemyAccountRepository(self._session)
+        self.journal_entries = SqlAlchemyJournalEntryRepository(self._session)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:

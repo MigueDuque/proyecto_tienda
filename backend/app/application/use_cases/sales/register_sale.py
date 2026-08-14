@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
 from decimal import Decimal
 
+from app.application.services.accounting_service import AccountingService, resolve_account_ids
 from app.application.unit_of_work import AbstractUnitOfWork
+from app.domain import accounting_codes as codes
 from app.domain.entities.inventory_movement import InventoryMovement
 from app.domain.entities.sale import Sale, SaleItem
 from app.domain.enums import MovementReferenceType, MovementType, PaymentMethod
@@ -23,8 +25,9 @@ class RegisterSaleInput:
 
 
 class RegisterSaleUseCase:
-    def __init__(self, uow: AbstractUnitOfWork):
+    def __init__(self, uow: AbstractUnitOfWork, accounting: AccountingService | None = None):
         self._uow = uow
+        self._accounting = accounting or AccountingService()
 
     def execute(self, data: RegisterSaleInput) -> Sale:
         if not data.items:
@@ -87,6 +90,15 @@ class RegisterSaleUseCase:
                 )
                 product.current_stock = new_stock
                 uow.products.update(product)
+
+            total_cost = sum((item.quantity * item.unit_cost for item in sale.items), Decimal("0"))
+            cash_or_receivable = (
+                codes.CAJA if data.payment_method == PaymentMethod.CONTADO else codes.CUENTAS_POR_COBRAR
+            )
+            needed_codes = [cash_or_receivable, codes.VENTAS, codes.COSTO_DE_VENTAS, codes.INVENTARIO]
+            account_ids = resolve_account_ids(uow, needed_codes)
+            entry = self._accounting.build_sale_entry(account_ids, sale, total_cost)
+            uow.journal_entries.add(entry)
 
             uow.commit()
             return sale

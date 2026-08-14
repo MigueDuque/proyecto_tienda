@@ -1,6 +1,10 @@
 from abc import ABC, abstractmethod
 from types import TracebackType
 
+from app.domain.repositories.accounting_repository import (
+    AccountRepository,
+    JournalEntryRepository,
+)
 from app.domain.repositories.category_repository import CategoryRepository
 from app.domain.repositories.inventory_repository import InventoryRepository
 from app.domain.repositories.partner_repository import PartnerRepository
@@ -24,6 +28,8 @@ class AbstractUnitOfWork(ABC):
     inventory_movements: InventoryRepository
     purchases: PurchaseRepository
     sales: SaleRepository
+    accounts: AccountRepository
+    journal_entries: JournalEntryRepository
 
     def __enter__(self) -> "AbstractUnitOfWork":
         return self

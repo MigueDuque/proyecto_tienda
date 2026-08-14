@@ -1,5 +1,10 @@
+from app.infrastructure.db.models.account_model import AccountModel
 from app.infrastructure.db.models.category_model import CategoryModel
 from app.infrastructure.db.models.inventory_movement_model import InventoryMovementModel
+from app.infrastructure.db.models.journal_entry_model import (
+    JournalEntryLineModel,
+    JournalEntryModel,
+)
 from app.infrastructure.db.models.partner_model import PartnerModel
 from app.infrastructure.db.models.product_model import ProductModel
 from app.infrastructure.db.models.purchase_model import PurchaseItemModel, PurchaseModel
@@ -16,4 +21,7 @@ __all__ = [
     "PurchaseItemModel",
     "SaleModel",
     "SaleItemModel",
+    "AccountModel",
+    "JournalEntryModel",
+    "JournalEntryLineModel",
 ]

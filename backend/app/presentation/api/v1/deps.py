@@ -5,6 +5,12 @@ from fastapi.security import OAuth2PasswordBearer
 
 from app.application.interfaces import PasswordHasher, TokenService
 from app.application.unit_of_work import AbstractUnitOfWork
+from app.application.use_cases.accounting.accounting_use_cases import (
+    GetAccountBalanceUseCase,
+    ListAccountsUseCase,
+    ListJournalEntriesUseCase,
+    RegisterManualEntryUseCase,
+)
 from app.application.use_cases.auth.login import LoginUseCase
 from app.application.use_cases.categories.category_use_cases import (
     CreateCategoryUseCase,
@@ -13,6 +19,7 @@ from app.application.use_cases.categories.category_use_cases import (
     ListCategoriesUseCase,
     UpdateCategoryUseCase,
 )
+from app.application.use_cases.dashboard.get_summary import GetDashboardSummaryUseCase
 from app.application.use_cases.inventory.inventory_use_cases import (
     AdjustStockUseCase,
     GetKardexUseCase,
@@ -216,3 +223,33 @@ def get_list_inventory_movements_use_case(
     uow: AbstractUnitOfWork = Depends(get_uow),
 ) -> ListInventoryMovementsUseCase:
     return ListInventoryMovementsUseCase(uow)
+
+
+# --- Accounting ---
+def get_register_manual_entry_use_case(
+    uow: AbstractUnitOfWork = Depends(get_uow),
+) -> RegisterManualEntryUseCase:
+    return RegisterManualEntryUseCase(uow)
+
+
+def get_list_journal_entries_use_case(
+    uow: AbstractUnitOfWork = Depends(get_uow),
+) -> ListJournalEntriesUseCase:
+    return ListJournalEntriesUseCase(uow)
+
+
+def get_list_accounts_use_case(uow: AbstractUnitOfWork = Depends(get_uow)) -> ListAccountsUseCase:
+    return ListAccountsUseCase(uow)
+
+
+def get_get_account_balance_use_case(
+    uow: AbstractUnitOfWork = Depends(get_uow),
+) -> GetAccountBalanceUseCase:
+    return GetAccountBalanceUseCase(uow)
+
+
+# --- Dashboard ---
+def get_dashboard_summary_use_case(
+    uow: AbstractUnitOfWork = Depends(get_uow),
+) -> GetDashboardSummaryUseCase:
+    return GetDashboardSummaryUseCase(uow)

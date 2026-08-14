@@ -1,8 +1,11 @@
 from copy import deepcopy
+from decimal import Decimal
 
 from app.application.unit_of_work import AbstractUnitOfWork
+from app.domain.entities.account import Account
 from app.domain.entities.category import Category
 from app.domain.entities.inventory_movement import InventoryMovement
+from app.domain.entities.journal_entry import JournalEntry
 from app.domain.entities.partner import Partner
 from app.domain.entities.product import Product
 from app.domain.entities.purchase import Purchase
@@ -203,6 +206,58 @@ class InMemorySaleRepository:
         return [deepcopy(i) for i in self._items.values()]
 
 
+class InMemoryAccountRepository:
+    def __init__(self):
+        self._items: dict[int, Account] = {}
+        self._next_id = 1
+
+    def add(self, account: Account) -> Account:
+        account.id = self._next_id
+        self._next_id += 1
+        self._items[account.id] = deepcopy(account)
+        return deepcopy(account)
+
+    def get_by_id(self, account_id: int) -> Account | None:
+        item = self._items.get(account_id)
+        return deepcopy(item) if item else None
+
+    def get_by_code(self, code: str) -> Account | None:
+        for item in self._items.values():
+            if item.code == code:
+                return deepcopy(item)
+        return None
+
+    def list(self) -> list[Account]:
+        return [deepcopy(i) for i in self._items.values()]
+
+    def get_balance(self, account_id: int) -> Decimal:
+        return Decimal("0")
+
+
+class InMemoryJournalEntryRepository:
+    def __init__(self):
+        self._items: dict[int, JournalEntry] = {}
+        self._next_id = 1
+        self._next_line_id = 1
+
+    def add(self, entry: JournalEntry) -> JournalEntry:
+        entry.id = self._next_id
+        self._next_id += 1
+        for line in entry.lines:
+            line.id = self._next_line_id
+            line.journal_entry_id = entry.id
+            self._next_line_id += 1
+        self._items[entry.id] = deepcopy(entry)
+        return deepcopy(entry)
+
+    def get_by_id(self, entry_id: int) -> JournalEntry | None:
+        item = self._items.get(entry_id)
+        return deepcopy(item) if item else None
+
+    def list_all(self) -> list[JournalEntry]:
+        return [deepcopy(i) for i in self._items.values()]
+
+
 class InMemoryUnitOfWork(AbstractUnitOfWork):
     """Fake UoW for unit-testing use cases without a real database."""
 
@@ -214,6 +269,8 @@ class InMemoryUnitOfWork(AbstractUnitOfWork):
         self.inventory_movements = InMemoryInventoryRepository()
         self.purchases = InMemoryPurchaseRepository()
         self.sales = InMemorySaleRepository()
+        self.accounts = InMemoryAccountRepository()
+        self.journal_entries = InMemoryJournalEntryRepository()
         self.committed = False
 
     def commit(self) -> None:
@@ -221,3 +278,11 @@ class InMemoryUnitOfWork(AbstractUnitOfWork):
 
     def rollback(self) -> None:
         pass
+
+
+def seed_chart_of_accounts(uow: InMemoryUnitOfWork) -> None:
+    from app.domain.accounting_codes import SEED_ACCOUNTS
+    from app.domain.enums import AccountType
+
+    for code, name, account_type in SEED_ACCOUNTS:
+        uow.accounts.add(Account(id=None, code=code, name=name, type=AccountType(account_type)))

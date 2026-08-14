@@ -2,11 +2,13 @@
 
 from decimal import Decimal
 
+from app.domain.accounting_codes import SEED_ACCOUNTS
+from app.domain.entities.account import Account
 from app.domain.entities.category import Category
 from app.domain.entities.partner import Partner
 from app.domain.entities.product import Product
 from app.domain.entities.user import User
-from app.domain.enums import PartnerType
+from app.domain.enums import AccountType, PartnerType
 from app.infrastructure.config import get_settings
 from app.infrastructure.db.unit_of_work import SqlAlchemyUnitOfWork
 from app.infrastructure.security.password_hasher import BcryptPasswordHasher
@@ -82,6 +84,13 @@ def run() -> None:
                     Partner(id=None, type=ptype, name=name, document_id=document_id, phone=phone)
                 )
                 print(f"Tercero creado: {name}")
+
+        for code, name, account_type in SEED_ACCOUNTS:
+            if uow.accounts.get_by_code(code) is None:
+                uow.accounts.add(
+                    Account(id=None, code=code, name=name, type=AccountType(account_type))
+                )
+                print(f"Cuenta contable creada: {code} - {name}")
 
         uow.commit()
 
